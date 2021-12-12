@@ -1,3 +1,4 @@
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -6,6 +7,8 @@ public class BaseAuthService implements AuthService {
         private String login;
         private String pass;
         private String nick;
+
+
 
         public Entry(String login, String pass, String nick) {
             this.login = login;
@@ -27,12 +30,36 @@ public class BaseAuthService implements AuthService {
     }
 
 
-    public BaseAuthService() {
+    public BaseAuthService() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:sqlite:chat.db");
+        System.out.println(connection);
+        Statement stmt = connection.createStatement();
+        System.out.println(stmt);
         entries = new ArrayList<>();
-        entries.add(new Entry("login1", "pass1", "nick1"));
+        ResultSet rs = stmt.executeQuery("SELECT login,password,nick FROM users;");
+        while (rs.next()){
+            entries.add(new Entry(rs.getString("login"),rs.getString("password"),rs.getString("nick")));
+        }
+
+
         entries.add(new Entry("login2", "pass2", "nick2"));
         entries.add(new Entry("login3", "pass3", "nick3"));
-    }
+        try {
+            if (stmt != null) {
+                stmt.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        }
 
     @Override
     public String getNickByLoginPass(String login, String pass) {
