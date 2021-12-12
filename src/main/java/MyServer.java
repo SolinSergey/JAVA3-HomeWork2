@@ -49,7 +49,7 @@ public class MyServer {
             o.sendMsg(msg);
         }
     }
-
+//
     public synchronized boolean personalMsg (String msg, String nick){
         for(ClientHandler o:clients){
             if (nick.equals(o.getName())){

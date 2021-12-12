@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-
+//
 public class NetworkChat extends JFrame {
     private JTextField message;
     private JTextArea chatArea;
