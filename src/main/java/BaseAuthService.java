@@ -42,8 +42,8 @@ public class BaseAuthService implements AuthService {
         }
 
 
-        entries.add(new Entry("login2", "pass2", "nick2"));
-        entries.add(new Entry("login3", "pass3", "nick3"));
+        //entries.add(new Entry("login2", "pass2", "nick2"));
+        //entries.add(new Entry("login3", "pass3", "nick3"));
         try {
             if (stmt != null) {
                 stmt.close();
