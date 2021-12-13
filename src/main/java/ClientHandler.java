@@ -45,8 +45,6 @@ public class ClientHandler {
             if (str.startsWith("/auth")) {
                 String[] parts = str.split("\\s");
                 nick = myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
-                System.out.println(nick);
-                System.out.println("!!!");
                 if (nick != null) {
                     if (!myServer.isNickBusy(nick)) {
                         sendMsg("/authok " + nick);
@@ -77,9 +75,6 @@ public class ClientHandler {
             if (strFromClient.startsWith("/w")) {
                 String[] parts = strFromClient.split("\\s");
                 msg=strFromClient.substring(parts[0].length()+parts[1].length()+2);
-                //System.out.println(strFromClient);
-                //System.out.println(parts[1]);
-                //System.out.println(parts[2]);
                 if (myServer.personalMsg("Личное сообщение от " + getName() + ": "+msg,parts[1])){
                     out.writeUTF("Личное сообщение для "+parts[1]+":"+msg);
                 }
@@ -88,20 +83,14 @@ public class ClientHandler {
                 }
             }else if (strFromClient.startsWith("/cn")) {
                 String[] parts = strFromClient.split("\\s");
-
-
                 Connection connection = DriverManager.getConnection("jdbc:sqlite:chat.db");
-                System.out.println(connection);
                 Statement stmt = connection.createStatement();
-                System.out.println(stmt);
                 connection.setAutoCommit(false);
                 try{
-                    //ResultSet rs;
                     PreparedStatement ps;
                     ps=connection.prepareStatement( "UPDATE users SET nick=? WHERE nick=?");
                     ps.setString(1,parts[1]);
                     ps.setString(2,nick);
-                    //executeQuery("UPDATE Users SET nick=\'"+parts[1]+"\' WHERE nick=\'"+nick+"\';");
                     ps.executeUpdate();
                     ps.close();
                     connection.commit();

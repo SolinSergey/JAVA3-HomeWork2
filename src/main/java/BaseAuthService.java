@@ -32,21 +32,12 @@ public class BaseAuthService implements AuthService {
 
     public BaseAuthService() throws SQLException {
         Connection connection = DriverManager.getConnection("jdbc:sqlite:chat.db");
-        System.out.println(connection);
         Statement stmt = connection.createStatement();
-        System.out.println(stmt);
         entries = new ArrayList<>();
         ResultSet rs = stmt.executeQuery("SELECT login,password,nick FROM users;");
         while (rs.next()){
             entries.add(new Entry(rs.getString("login"), rs.getString("password"), rs.getString("nick")));
-
         }
-        //for (int i=0;i<entries.size();i++){
-        //    System.out.println(entries.get(i));
-        //}
-
-        //entries.add(new Entry("login2", "pass2", "nick2"));
-        //entries.add(new Entry("login3", "pass3", "nick3"));
         try {
             if (stmt != null) {
                 stmt.close();
