@@ -38,9 +38,12 @@ public class BaseAuthService implements AuthService {
         entries = new ArrayList<>();
         ResultSet rs = stmt.executeQuery("SELECT login,password,nick FROM users;");
         while (rs.next()){
-            entries.add(new Entry(rs.getString("login"),rs.getString("password"),rs.getString("nick")));
-        }
+            entries.add(new Entry(rs.getString("login"), rs.getString("password"), rs.getString("nick")));
 
+        }
+        //for (int i=0;i<entries.size();i++){
+        //    System.out.println(entries.get(i));
+        //}
 
         //entries.add(new Entry("login2", "pass2", "nick2"));
         //entries.add(new Entry("login3", "pass3", "nick3"));

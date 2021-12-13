@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.*;
 
 public class ClientHandler {
     private MyServer myServer;
@@ -27,7 +28,7 @@ public class ClientHandler {
                 try {
                     authentication();
                     readMessages();
-                } catch (IOException e) {
+                } catch (IOException | SQLException e) {
                     e.printStackTrace();
                 } finally {
                     closeConnection();
@@ -44,6 +45,8 @@ public class ClientHandler {
             if (str.startsWith("/auth")) {
                 String[] parts = str.split("\\s");
                 nick = myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
+                System.out.println(nick);
+                System.out.println("!!!");
                 if (nick != null) {
                     if (!myServer.isNickBusy(nick)) {
                         sendMsg("/authok " + nick);
@@ -62,9 +65,10 @@ public class ClientHandler {
         }
     }
 
-    public void readMessages() throws IOException {
+    public void readMessages() throws IOException, SQLException {
         while (true) {
             String strFromClient = in.readUTF();
+            strFromClient = strFromClient.trim();
             String msg;
             System.out.println("от " + name + ": " + strFromClient);
             if (strFromClient.equals("/end")) {
@@ -82,8 +86,41 @@ public class ClientHandler {
                 else{
                     out.writeUTF("Участника с ником: "+parts[1]+" нет в чате");
                 }
-            }
-            else{
+            }else if (strFromClient.startsWith("/cn")) {
+                String[] parts = strFromClient.split("\\s");
+
+
+                Connection connection = DriverManager.getConnection("jdbc:sqlite:chat.db");
+                System.out.println(connection);
+                Statement stmt = connection.createStatement();
+                System.out.println(stmt);
+                connection.setAutoCommit(false);
+                try{
+                    //ResultSet rs;
+                    PreparedStatement ps;
+                    ps=connection.prepareStatement( "UPDATE users SET nick=? WHERE nick=?");
+                    ps.setString(1,parts[1]);
+                    ps.setString(2,nick);
+                    //executeQuery("UPDATE Users SET nick=\'"+parts[1]+"\' WHERE nick=\'"+nick+"\';");
+                    ps.executeUpdate();
+                    ps.close();
+                    connection.commit();
+                    name = parts[1];
+                    nick = parts[1];
+                    myServer.broadcastClientsList();
+                    myServer.broadcastMsg("Участник чата " + name + " заменил ник на новый: " + parts[1]);
+                }
+                catch (SQLException e){
+                    e.printStackTrace();
+                    connection.rollback();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
+            }else{
                 myServer.broadcastMsg(name + ": " + strFromClient);
             }
 
